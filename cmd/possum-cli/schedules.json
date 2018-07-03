@@ -1,0 +1,21 @@
+[
+	{
+		"Name": "OfficeHours",
+		"Locations": [
+			"Pacific/Auckland"
+		],
+		"Periods": [
+			{
+				"StartTime": "18:00",
+				"StopTime": "21:00",
+				"Weekdays": [
+					"Monday",
+					"Tuesday",
+					"Wednesday",
+					"Thursday",
+					"Friday"
+				]
+			}
+		]
+	}
+]

@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Shutdown/Start instances on a schedule
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  Possum:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: possum
+      Runtime: go1.x
+      CodeUri: ./build/
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: AllAtOnce
+      Timeout: 30
+      Policies:
+        - AWSXrayWriteOnlyAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'ec2:DescribeRegions'
+                - 'ec2:DescribeInstances'
+                - 'ec2:StartInstances'
+                - 'ec2:StopInstances'
+                - 'autoscaling:DescribeAutoScalingGroups'
+                - 'autoscaling:DescribeTags'
+                - 'autoscaling:CreateOrUpdateTags'
+                - 'autoscaling:UpdateAutoScalingGroup'
+                - 'rds:DescribeDBInstances'
+                - 'rds:ListTagsForResource'
+                - 'rds:StartDBInstance'
+                - 'rds:StopDBInstance'
+              Resource: '*'
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+              Resource:
+                Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${ConfigTable}
+      Tags:
+        rf:cluster: lambda
+        rf:stack: possum
+        rf:environment: prod
+      Events:
+        CheckEvery3Min:
+          Type: Schedule
+          Properties:
+            Schedule: rate(5 minutes)
+      Environment:
+        Variables:
+          SLACK_TOKEN: "xxxxxxxxx"
+          SLACK_ROOM: "xxxxxxx"
+          CONFIG_TABLE:
+            Ref: ConfigTable
+  ConfigTable:
+      Type: AWS::Serverless::SimpleTable
+      Properties:
+        PrimaryKey:
+          Name: id
+          Type: String
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        Tags:
+          rf:cluster: lambda
+          rf:stack: possum
+          rf:environment: prod
