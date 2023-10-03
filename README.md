@@ -49,3 +49,33 @@ Start tries to find the previous min size and desired capacity from tags set on 
 values cannot be parsed it sets the min size and desired capacity to 1.
 
 
+
+## Building and Deploying to Lambda
+
+The `root` directory of this project contains the `possum` application. However the execution via Lambda is controlled via a separate application stored in `cmd/lambda`.
+
+You don't need to build the `possum` application itself as it is included in the `lambda` function of this repository.
+
+### Building package
+
+In order to deploy your changes, you will need to package the deployment using `aws cloudformation package`. To simplify this process, a `Makefile` has been created to perform this action for you.
+
+```
+cd cmd/lambda
+
+aws-vault exec <account> -- make package
+```
+
+This command will build the golang `lambda` application, combine it with the `template.yml` Cloudformation, and package it together to be consumed by Cloudformation.
+
+### Deploying function
+
+Once you have your package build, you can push out your changes using `aws cloudformation deploy` functionality. To simplify this process, the `Makefile` contains a `deploy` function that does this for you.
+
+```
+cd cmd/lambda
+
+aws-vault exec <account> -- make deploy
+```
+
+This command will tell Cloudformation to deploy the package created using `make package`.

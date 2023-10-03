@@ -18,8 +18,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/rds"
-	"github.com/nlopes/slack"
-	"github.com/stojg/possum"
+	"github.com/slack-go/slack"
+	"github.com/silverstripeltd/possum"
 )
 
 func main() {
@@ -32,7 +32,7 @@ func main() {
 func Handler(ctx context.Context, evt events.CloudWatchEvent) (interface{}, error) {
 
 	notifier := &Slack{
-		channelID: os.Getenv("SLACK_ROOM"),
+		channelID: os.Getenv("SLACK_CHANNEL"),
 		token:     os.Getenv("SLACK_TOKEN"),
 	}
 
@@ -166,8 +166,6 @@ func (s *Slack) Notify(message string) error {
 
 	api := slack.New(s.token)
 
-	_, _, err := api.PostMessage(s.channelID, message, slack.PostMessageParameters{
-		AsUser: true,
-	})
+	_, _, err := api.PostMessage(s.channelID, slack.MsgOptionText(message, false), slack.MsgOptionAsUser(true))
 	return err
 }
