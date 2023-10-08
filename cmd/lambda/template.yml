@@ -5,8 +5,8 @@ Resources:
   Possum:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: possum
-      Runtime: go1.x
+      Handler: bootstrap
+      Runtime: provided.al2
       CodeUri: ./build/
       AutoPublishAlias: live
       DeploymentPreference:
@@ -50,7 +50,7 @@ Resources:
       Environment:
         Variables:
           SLACK_TOKEN: "xxxxxxxxx"
-          SLACK_ROOM: "xxxxxxx"
+          SLACK_CHANNEL: "xxxxxxx"
           CONFIG_TABLE:
             Ref: ConfigTable
   ConfigTable:

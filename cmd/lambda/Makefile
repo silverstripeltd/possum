@@ -13,8 +13,8 @@ test:
 	go test
 
 package:
-	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o build/possum
-	aws cloudformation package --template-file template.yml --s3-bucket BUCKET_NAME --s3-prefix lambda-possum-prod --output-template-file ./build/packaged-template.yml
+	GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -tags lambda.norpc -o build/bootstrap main.go
+	aws cloudformation package --template-file template.yml --s3-bucket playpen-rainforest-deploy --s3-prefix lambda-possum-prod --output-template-file ./build/packaged-template.yml
 
 deploy:
 	aws cloudformation deploy --template-file ./build/packaged-template.yml --capabilities CAPABILITY_IAM --stack-name lambda-possum-prod
